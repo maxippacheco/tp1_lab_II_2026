@@ -16,9 +16,6 @@ recolectadas en islas del archipiélago Palmer (Antártida).
 ```
 ├── TP1_Palmer_Penguins_EDA.ipynb   # Notebook con la resolución de los Ejercicios 1 a 4
 ├── dashboard.py                    # Dashboard interactivo en Streamlit (Ejercicio 5)
-├── GTP 1 - ... v3.pdf              # Consigna del trabajo práctico
-├── U1___Analisis_de_datos.pdf      # Material teórico de la unidad
-├── U1__Analisis_de_datos_cont.pdf  # Material teórico de la unidad (continuación)
 ├── pyproject.toml                  # Dependencias del proyecto (con uv)
 └── uv.lock                         # Lockfile del entorno
 ```
