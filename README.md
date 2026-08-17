@@ -14,7 +14,7 @@ recolectadas en islas del archipiélago Palmer (Antártida).
 ## Estructura del repositorio
 
 ```
-├── TP1_Palmer_Penguins_EDA.ipynb   # Notebook con la resolución de los Ejercicios 1 a 4
+├── TP1_Laboratorio_de_datos_2.ipynb   # Notebook con la resolución de los Ejercicios 1 a 4
 ├── dashboard.py                    # Dashboard interactivo en Streamlit (Ejercicio 5)
 ├── pyproject.toml                  # Dependencias del proyecto (con uv)
 └── uv.lock                         # Lockfile del entorno
@@ -22,7 +22,7 @@ recolectadas en islas del archipiélago Palmer (Antártida).
 
 ## Contenido del trabajo
 
-El notebook `TP1_Palmer_Penguins_EDA.ipynb` resuelve, en orden:
+El notebook `TP1_Laboratorio_de_datos_2.ipynb` resuelve, en orden:
 
 1. **Estadística descriptiva y análisis univariado** — estructura del dataset, valores faltantes,
    medidas de tendencia central y dispersión, asimetría/curtosis, histogramas, boxplots y
