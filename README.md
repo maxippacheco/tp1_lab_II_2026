@@ -75,3 +75,18 @@ uv run streamlit run dashboard.py
 Dataset Palmer Penguins (Gorman, Williams & Fraser, 2014), distribuido a través del paquete
 `seaborn` (`sns.load_dataset("penguins")`). Repositorio original:
 https://github.com/allisonhorst/penguins
+
+## Checklist de avance
+
+- [x] Entorno del proyecto (`pyproject.toml` / `uv.lock`) definido y probado
+- [x] README con estructura, instrucciones y flujo de trabajo
+- [ ] Notebook subido al repositorio (`feature/exercise1` → PR → `main`)
+- [ ] Ejercicio 1 — Estadística descriptiva y análisis univariado
+- [ ] Ejercicio 2 — Análisis bivariado (correlaciones y asociaciones)
+- [ ] Ejercicio 3 — Análisis multivariado y visualización avanzada
+- [ ] Ejercicio 4 — Muestreo y reducción dimensional
+- [ ] Ejercicio 5 — Dashboard Streamlit (`dashboard.py`)
+- [ ] Revisión cruzada de cada PR (Maximo P. ↔ Maximo Z.)
+- [ ] Notebook corre de punta a punta sin errores (`jupyter nbconvert --execute`)
+- [ ] Dashboard probado localmente (`streamlit run dashboard.py`)
+- [ ] Entrega final revisada por ambos integrantes en `main`
