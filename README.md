@@ -80,8 +80,8 @@ https://github.com/allisonhorst/penguins
 
 - [x] Entorno del proyecto (`pyproject.toml` / `uv.lock`) definido y probado
 - [x] README con estructura, instrucciones y flujo de trabajo
-- [ ] Notebook subido al repositorio (`feature/exercise1` → PR → `main`)
-- [ ] Ejercicio 1 — Estadística descriptiva y análisis univariado
+- [x] Notebook subido al repositorio (`feature/exercise1` → PR → `main`)
+- [x] Ejercicio 1 — Estadística descriptiva y análisis univariado
 - [ ] Ejercicio 2 — Análisis bivariado (correlaciones y asociaciones)
 - [ ] Ejercicio 3 — Análisis multivariado y visualización avanzada
 - [ ] Ejercicio 4 — Muestreo y reducción dimensional
