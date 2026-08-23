@@ -17,7 +17,7 @@ recolectadas en islas del archipiélago Palmer (Antártida).
 ├── TP1_Laboratorio_de_datos_2.ipynb   # Notebook con la resolución de los Ejercicios 1 a 4
 ├── dashboard.py                    # Dashboard interactivo en Streamlit (Ejercicio 5)
 ├── pyproject.toml                  # Dependencias del proyecto (con uv)
-└── uv.lock                         # Lockfile del entorno
+└── .python-version                 # Version de python
 ```
 
 ## Contenido del trabajo
