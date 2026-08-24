@@ -16,6 +16,8 @@ recolectadas en islas del archipiélago Palmer (Antártida).
 ```
 ├── TP1_Laboratorio_de_datos_2.ipynb   # Notebook con la resolución de los Ejercicios 1 a 4
 ├── dashboard.py                    # Dashboard interactivo en Streamlit (Ejercicio 5)
+├── config.py                       # Colores, paleta de especies y etiquetas del dashboard
+├── utils.py                        # Funciones de cálculo puro usadas por el dashboard
 ├── pyproject.toml                  # Dependencias del proyecto (con uv)
 └── .python-version                 # Version de python
 ```
@@ -37,7 +39,9 @@ El notebook `TP1_Laboratorio_de_datos_2.ipynb` resuelve, en orden:
 
 El **Ejercicio 5** (dashboard interactivo) se resuelve aparte en `dashboard.py`, ya que Streamlit no
 corre dentro de un notebook. Presenta una grilla 2×2 con cuatro visualizaciones que evidencian
-valores faltantes, outliers, tendencias bivariadas y separabilidad de especies.
+valores faltantes, outliers, tendencias bivariadas y separabilidad de especies. La paleta de colores
+y etiquetas viven en `config.py`, y los cálculos (outliers, silhouette score) en `utils.py`, para
+mantener `dashboard.py` enfocado en la lógica de la app.
 
 ## Cómo correrlo
 
@@ -82,11 +86,11 @@ https://github.com/allisonhorst/penguins
 - [x] README con estructura, instrucciones y flujo de trabajo
 - [x] Notebook subido al repositorio (`feature/exercise1` → PR → `main`)
 - [x] Ejercicio 1 — Estadística descriptiva y análisis univariado
-- [ ] Ejercicio 2 — Análisis bivariado (correlaciones y asociaciones)
-- [ ] Ejercicio 3 — Análisis multivariado y visualización avanzada
-- [ ] Ejercicio 4 — Muestreo y reducción dimensional
-- [ ] Ejercicio 5 — Dashboard Streamlit (`dashboard.py`)
-- [ ] Revisión cruzada de cada PR (Maximo P. ↔ Maximo Z.)
-- [ ] Notebook corre de punta a punta sin errores (`jupyter nbconvert --execute`)
-- [ ] Dashboard probado localmente (`streamlit run dashboard.py`)
-- [ ] Entrega final revisada por ambos integrantes en `main`
+- [x] Ejercicio 2 — Análisis bivariado (correlaciones y asociaciones)
+- [x] Ejercicio 3 — Análisis multivariado y visualización avanzada
+- [x] Ejercicio 4 — Muestreo y reducción dimensional
+- [x] Ejercicio 5 — Dashboard Streamlit (`dashboard.py`)
+- [x] Revisión cruzada de cada PR (Maximo P. ↔ Maximo Z.)
+- [x] Notebook corre de punta a punta sin errores (`jupyter nbconvert --execute`)
+- [x] Dashboard probado localmente (`streamlit run dashboard.py`)
+- [x] Entrega final revisada por ambos integrantes en `main`
