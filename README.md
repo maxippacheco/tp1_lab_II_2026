@@ -91,6 +91,6 @@ https://github.com/allisonhorst/penguins
 - [x] Ejercicio 4 — Muestreo y reducción dimensional
 - [x] Ejercicio 5 — Dashboard Streamlit (`dashboard.py`)
 - [x] Revisión cruzada de cada PR (Maximo P. ↔ Maximo Z.)
-- [ ] Notebook corre de punta a punta sin errores (`jupyter nbconvert --execute`)
-- [ ] Dashboard probado localmente (`streamlit run dashboard.py`)
-- [ ] Entrega final revisada por ambos integrantes en `main`
+- [x] Notebook corre de punta a punta sin errores (`jupyter nbconvert --execute`)
+- [x] Dashboard probado localmente (`streamlit run dashboard.py`)
+- [x] Entrega final revisada por ambos integrantes en `main`
