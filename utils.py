@@ -24,13 +24,13 @@ def contar_outliers_iqr(df, columnas):
     return int(es_outlier.sum().sum())
 
 
-# def calcular_silhouette(df, var_x, var_y):
-#     """Silhouette score de las especies, usando solo dos variables ya estandarizadas.
+def calcular_silhouette(df, var_x, var_y):
+    """Silhouette score de las especies, usando solo dos variables ya estandarizadas.
 
-#     Devuelve None si no hay dos variables distintas para comparar, o si quedó
-#     seleccionada una sola especie (el silhouette score no tiene sentido con 1 sola clase).
-#     """
-#     if var_x == var_y or df["species"].nunique() < 2:
-#         return None
-#     X = StandardScaler().fit_transform(df[[var_x, var_y]])
-#     return silhouette_score(X, df["species"])
+    Devuelve None si no hay dos variables distintas para comparar, o si quedó
+    seleccionada una sola especie (el silhouette score no tiene sentido con 1 sola clase).
+    """
+    if var_x == var_y or df["species"].nunique() < 2:
+        return None
+    X = StandardScaler().fit_transform(df[[var_x, var_y]])
+    return silhouette_score(X, df["species"])

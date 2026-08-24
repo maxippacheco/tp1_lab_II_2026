@@ -312,4 +312,10 @@ with fila2_col2:
         fig.tight_layout()
         st.pyplot(fig)
 
+        if sil is None:
+            badge("⚪ Elegí dos variables distintas", COLOR_INFO)
+        else:
+            icono = "🟢" if sil >= 0.5 else "🟡" if sil >= 0.25 else "🔴"
+            color = COLOR_OK if sil >= 0.5 else COLOR_WARN if sil >= 0.25 else COLOR_BAD
+            badge(f"{icono} Separación {nivel_separa} (silhouette = {sil:.2f})", color)
         st.caption("Probá distintos pares de variables en la barra lateral para ver cuáles separan mejor.")
