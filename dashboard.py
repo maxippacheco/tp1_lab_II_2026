@@ -1,40 +1,36 @@
 """Ejercicio 5: Diseño Visual y Narrativa de Datos.
 
-Dashboard interactivo (Streamlit) que comprueba visualmente, en una grilla 2x2, las
-afirmaciones típicas del EDA de Palmer Penguins: valores faltantes, outliers, tendencias
-bivariadas y alta separabilidad entre especies. Cada panel abre con un título de acción y un
-KPI/veredicto de color, y arriba de todo se arma una "Gran Idea" que resume el hallazgo
-combinado, siguiendo los principios de narrativa de datos de Knaflic (2015).
+Dashboard hecho con Streamlit para explorar el dataset de Palmer Penguins:
+valores faltantes, outliers, correlación entre dos variables y separación entre
+especies, en una grilla de 4 paneles. Arriba de todo hay un resumen corto
+con las conclusiones principales, siguiendo la idea de Knaflic (2015) de
+mostrar primero el mensaje y después el detalle.
 
-Ejecutar con: uv run streamlit run dashboard.py
+Para correrlo: uv run streamlit run dashboard.py
 """
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
+
+from utils import calcular_silhouette, contar_outliers_iqr
+from config import (
+    COLOR_BAD,
+    COLOR_INFO,
+    COLOR_OK,
+    COLOR_WARN,
+    ETIQUETAS,
+    FONDO,
+    GRILLA,
+    NUMERICAS,
+    PALETA,
+    TARJETA,
+    TEXTO,
+)
 
 st.set_page_config(page_title="Palmer Penguins — EDA", page_icon="🐧", layout="wide")
 
-FONDO = "#0E1117"
-TARJETA = "#161B22"
-TEXTO = "#E6E6E6"
-GRILLA = "#30363D"
-COLOR_OK = "#3FB950"
-COLOR_WARN = "#D29922"
-COLOR_BAD = "#F85149"
-COLOR_INFO = "#58A6FF"
-PALETA = {"Adelie": "#5B9BD5", "Chinstrap": "#F2A65A", "Gentoo": "#70C1A0"}
-NUMERICAS = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
-ETIQUETAS = {
-    "bill_length_mm": "Largo del pico (mm)",
-    "bill_depth_mm": "Profundidad del pico (mm)",
-    "flipper_length_mm": "Largo de la aleta (mm)",
-    "body_mass_g": "Masa corporal (g)",
-    "sex": "Sexo",
-}
-
+# --- tema oscuro para los gráficos de matplotlib/seaborn, mismos colores que el resto ---
 sns.set_theme(
     style="darkgrid",
     rc={
@@ -54,6 +50,7 @@ sns.set_theme(
     },
 )
 
+# CSS para que las tarjetas de st.metric usen el mismo tema oscuro
 st.markdown(
     f"""
     <style>
@@ -70,6 +67,7 @@ st.markdown(
 
 
 def badge(texto, color):
+    """Chip de color para mostrar un veredicto corto (🟢/🟡/🔴) al pie de cada panel."""
     st.markdown(
         f'<div style="display:inline-block;background-color:{color}22;color:{color};'
         f'border:1px solid {color}66;padding:3px 12px;border-radius:999px;'
@@ -80,30 +78,17 @@ def badge(texto, color):
 
 @st.cache_data
 def cargar_datos():
+    """Carga el dataset una sola vez y lo cachea (Streamlit reejecuta el script en cada interacción)."""
     return sns.load_dataset("penguins")
-
-
-def contar_outliers_iqr(df, columnas):
-    total = 0
-    for col in columnas:
-        q1, q3 = df[col].quantile([0.25, 0.75])
-        iqr = q3 - q1
-        lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
-        total += int(((df[col] < lo) | (df[col] > hi)).sum())
-    return total
-
-
-def calcular_silhouette(df, var_x, var_y):
-    if var_x == var_y or df["species"].nunique() < 2:
-        return None
-    X = StandardScaler().fit_transform(df[[var_x, var_y]])
-    return silhouette_score(X, df["species"])
 
 
 pinguinos = cargar_datos()
 
-st.title("🐧 Palmer Penguins: patrones, anomalías y separabilidad de especies")
+st.title("🐧 Palmer Penguins: patrones, anomalías y separación entre especies")
 
+# ============================================================
+# Sidebar: filtros y variables de cada panel
+# ============================================================
 st.sidebar.header("Filtros")
 especies_sel = st.sidebar.multiselect(
     "Especies a incluir (paneles 2 a 4)",
@@ -123,6 +108,7 @@ mostrar_contornos = st.sidebar.checkbox("Panel 4 — mostrar contornos de densid
 
 st.sidebar.divider()
 st.sidebar.header("Comparar variables")
+
 st.sidebar.caption("Panel 3 — tendencia bivariada")
 var_x_tendencia = st.sidebar.selectbox(
     "Eje X", NUMERICAS, index=NUMERICAS.index("flipper_length_mm"), key="tend_x",
@@ -132,6 +118,7 @@ var_y_tendencia = st.sidebar.selectbox(
     "Eje Y", NUMERICAS, index=NUMERICAS.index("body_mass_g"), key="tend_y",
     format_func=lambda c: ETIQUETAS[c],
 )
+
 st.sidebar.caption("Panel 4 — separabilidad de especies")
 var_x_separa = st.sidebar.selectbox(
     "Eje X ", NUMERICAS, index=NUMERICAS.index("bill_length_mm"), key="sep_x",
@@ -142,10 +129,16 @@ var_y_separa = st.sidebar.selectbox(
     format_func=lambda c: ETIQUETAS[c],
 )
 
+# datos_filtrados: solo aplica el filtro de especies (lo uso en el panel de outliers,
+# donde también me interesa ver filas con NaN en otras columnas).
+# datos_completos: además saca filas con NaN en las 4 variables numéricas
+# (lo necesito para correlación y para los scatterplots).
 datos_filtrados = pinguinos[pinguinos["species"].isin(especies_sel)]
 datos_completos = datos_filtrados.dropna(subset=NUMERICAS)
 
-# --- Estadísticos compartidos entre la "Gran Idea", los KPI y los badges de cada panel ---
+# ============================================================
+# Estadísticos que después reutilizo en el resumen de arriba, los KPI y los badges
+# ============================================================
 pct_incompletas = pinguinos.isna().any(axis=1).mean() * 100
 outliers_kpi = contar_outliers_iqr(datos_completos, NUMERICAS)
 
@@ -156,17 +149,22 @@ fuerza_tendencia = "fuerte" if abs(r_tendencia) >= 0.7 else "moderada" if abs(r_
 sil = calcular_silhouette(datos_completos, var_x_separa, var_y_separa)
 nivel_separa = None if sil is None else ("alta" if sil >= 0.5 else "moderada" if sil >= 0.25 else "baja")
 
+# Frases armadas según lo que haya elegido el usuario en la sidebar: si eligió
+# las mismas variables en ambos ejes, aviso en el texto en vez de romper el cálculo
 frase_tendencia = (
     f"una tendencia {fuerza_tendencia} (r = {r_tendencia:.2f}) entre "
     f"{ETIQUETAS[var_x_tendencia].lower()} y {ETIQUETAS[var_y_tendencia].lower()}"
     if hay_par_tendencia else "una tendencia bivariada (elegí dos variables distintas en el panel 3)"
 )
 frase_separa = (
-    f"una separabilidad {nivel_separa} entre especies (silhouette = {sil:.2f}) usando "
+    f"una separación {nivel_separa} entre especies usando "
     f"{ETIQUETAS[var_x_separa].lower()} y {ETIQUETAS[var_y_separa].lower()}"
-    if sil is not None else "una separabilidad que no se puede medir con la selección actual"
+    if sil is not None else "una separación que no se puede medir con la selección actual"
 )
 
+# ============================================================
+# Resumen de arriba: idea principal del dashboard en una sola frase
+# ============================================================
 st.markdown(
     f"**Idea principal:** el dataset está prácticamente limpio — solo **{pct_incompletas:.1f}%** de "
     f"las filas tiene datos faltantes (concentrados en `sex`) y casi no hay outliers — y ya se "
@@ -175,6 +173,9 @@ st.markdown(
 )
 st.caption("Usá los controles de la barra lateral para filtrar especies y comparar otros pares de variables.")
 
+# ============================================================
+# Fila de KPIs (uno por panel)
+# ============================================================
 r_txt = f"{r_tendencia:.2f}" if hay_par_tendencia else "n/d"
 sil_txt = f"{sil:.2f}" if sil is not None else "n/d"
 
@@ -182,12 +183,17 @@ m1, m2, m3, m4 = st.columns(4)
 m1.metric("1. Filas con faltantes", f"{pct_incompletas:.1f}%", help="Sobre las 344 filas totales; no depende del filtro de especies.")
 m2.metric("2. Outliers (1.5×IQR)", outliers_kpi, help="Sobre la selección de especies actual.")
 m3.metric("3. Correlación (r)", r_txt, help=f"{ETIQUETAS[var_x_tendencia]} vs. {ETIQUETAS[var_y_tendencia]}")
-m4.metric("4. Separabilidad (silhouette)", sil_txt, help=f"{ETIQUETAS[var_x_separa]} vs. {ETIQUETAS[var_y_separa]}")
+m4.metric("4. Separación entre especies", sil_txt, help=f"{ETIQUETAS[var_x_separa]} vs. {ETIQUETAS[var_y_separa]}")
 
 st.write("")
+
+# ============================================================
+# Grilla 2x2 de paneles
+# ============================================================
 fila1_col1, fila1_col2 = st.columns(2)
 fila2_col1, fila2_col2 = st.columns(2)
 
+# --- Panel 1: valores faltantes por columna ---
 with fila1_col1:
     with st.container(border=True):
         st.subheader("1. Valores faltantes")
@@ -197,13 +203,14 @@ with fila1_col1:
 
         fig, ax = plt.subplots(figsize=(5.2, 3.6))
         barras = ax.barh(etiquetas_y, faltantes.values, color=COLOR_BAD, height=0.55)
+        # cantidad y porcentaje al final de cada barra
         for barra, valor in zip(barras, faltantes.values):
             pct = valor / len(pinguinos) * 100
             ax.text(
                 barra.get_width() + faltantes.max() * 0.03, barra.get_y() + barra.get_height() / 2,
                 f"{valor} ({pct:.1f}%)", va="center", fontsize=9, color=TEXTO,
             )
-        ax.set_xlim(0, faltantes.max() * 1.35)
+        ax.set_xlim(0, faltantes.max() * 1.35)  # espacio extra para que no se corten las etiquetas
         ax.set_xlabel("Observaciones con valor faltante")
         ax.set_title("Cantidad de valores faltantes por variable", fontsize=10)
         ax.grid(axis="y", visible=False)
@@ -217,6 +224,7 @@ with fila1_col1:
             "a la vez — no es ruido aleatorio uniforme."
         )
 
+# --- Panel 2: outliers por variable (boxplots), opción de separar por especie ---
 with fila1_col2:
     with st.container(border=True):
         st.subheader("2. Outliers en variables morfológicas")
@@ -244,6 +252,7 @@ with fila1_col2:
             badge(f"🟡 {outliers_kpi} outliers detectados (1.5×IQR)", COLOR_WARN)
         st.caption("Los bigotes cubren casi todo el rango observado en las 4 variables y en las 3 especies.")
 
+# --- Panel 3: scatter + tendencia entre las dos variables elegidas en la sidebar ---
 with fila2_col1:
     with st.container(border=True):
         st.subheader("3. Explorá una tendencia bivariada")
@@ -274,9 +283,10 @@ with fila2_col1:
             badge(f"{icono} Correlación {fuerza_tendencia} (r = {r_tendencia:.2f})", color)
         st.caption("Cambiá los ejes en la barra lateral para comparar otras relaciones.")
 
+# --- Panel 4: separación entre especies (scatter + contornos de densidad opcionales) ---
 with fila2_col2:
     with st.container(border=True):
-        st.subheader("4. Separabilidad de especies")
+        st.subheader("4. Separación entre especies")
         fig, ax = plt.subplots(figsize=(5.4, 3.7))
         sns.scatterplot(
             data=datos_completos, x=var_x_separa, y=var_y_separa,
@@ -284,6 +294,7 @@ with fila2_col2:
             edgecolor=FONDO, linewidth=0.4, ax=ax,
         )
         if mostrar_contornos:
+            # un contorno KDE por especie (solo si hay puntos suficientes y ejes distintos)
             for especie, color in PALETA.items():
                 if especie not in especies_sel:
                     continue
@@ -301,10 +312,4 @@ with fila2_col2:
         fig.tight_layout()
         st.pyplot(fig)
 
-        if sil is None:
-            badge("⚪ Seleccioná 2+ especies y variables distintas", COLOR_INFO)
-        else:
-            icono = "🟢" if sil >= 0.5 else "🟡" if sil >= 0.25 else "🔴"
-            color = COLOR_OK if sil >= 0.5 else COLOR_WARN if sil >= 0.25 else COLOR_BAD
-            badge(f"{icono} Separabilidad {nivel_separa} (silhouette = {sil:.2f})", color)
         st.caption("Probá distintos pares de variables en la barra lateral para ver cuáles separan mejor.")
